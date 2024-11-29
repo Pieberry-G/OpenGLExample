@@ -1,4 +1,3 @@
-#if 0
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -81,9 +80,8 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("../assets/meshes/demo0/demo0.gltf");
-    //Model ourModel("../assets/meshes/demo2/demo2.gltf");
-    //Model ourModel("../assets/meshes/FlightHelmet/glTF/FlightHelmet.gltf");
+    //Model ourModel("../assets/meshes/bad/bad.gltf");
+    Model ourModel("../assets/meshes/test.glb");
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -121,8 +119,8 @@ int main()
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1, 0, 0));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
 
-        glm::vec3 sphereCenter = (ourModel._maximumBounds + ourModel._minimumBounds) / 2.0f;
-        model = glm::translate(model, -sphereCenter); // translate it down so it's at the center of the scene
+        //glm::vec3 sphereCenter = (ourModel._maximumBounds + ourModel._minimumBounds) / 2.0f;
+        //model = glm::translate(model, -sphereCenter); // translate it down so it's at the center of the scene
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
@@ -194,5 +192,3 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
-
-#endif

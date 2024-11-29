@@ -20,4 +20,4 @@ file(GLOB_RECURSE HEADERS "include/*.h")
 add_executable(OpenGLExample "${SRCS}" "${HEADERS}")
 target_include_directories(OpenGLExample PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_link_libraries(OpenGLExample glad glfw glm stb_image assimp)
+target_link_libraries(OpenGLExample glad glfw glm stb_image tinygltf assimp)

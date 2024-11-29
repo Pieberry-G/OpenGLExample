@@ -31,10 +31,16 @@ struct Vertex {
 	float m_Weights[MAX_BONE_INFLUENCE];
 };
 
+// A glTF material stores information in e.g. the texture that is attached to it and colors
+struct Material {
+    glm::vec4 baseColorFactor = glm::vec4(1.0f);
+    uint32_t baseColorTextureIndex;
+};
+
+// A glTF texture stores a reference to the image and a sampler
+// In this sample, we are only interested in the image
 struct Texture {
-    unsigned int id;
-    string type;
-    string path;
+    int32_t imageIndex;
 };
 
 class Mesh {
@@ -42,68 +48,57 @@ public:
     // mesh Data
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
-    vector<Texture>      textures;
+    int                  materialIndex;
     unsigned int VAO;
 
     glm::vec3 _minimumBounds;
     glm::vec3 _maximumBounds;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, int materialIndex)
     {
         this->vertices = vertices;
         this->indices = indices;
-        this->textures = textures;
-
-        computeBounds();
+        this->materialIndex = materialIndex;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
     }
 
-    void computeBounds()
-    {
-        constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
-        _minimumBounds = { MAX_FLOAT, MAX_FLOAT, MAX_FLOAT };
-        _maximumBounds = { -MAX_FLOAT, -MAX_FLOAT, -MAX_FLOAT };
-        for (auto& vertice : vertices)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                _minimumBounds[i] = std::min(vertice.Position[i], _minimumBounds[i]);
-                _maximumBounds[i] = std::max(vertice.Position[i], _maximumBounds[i]);
-            }
-        }
-    }
-
     // render the mesh
-    void Draw(Shader &shader) 
+    void Draw(Shader& shader, std::vector<uint32_t>& images, std::vector<Texture>& textures, std::vector<Material>& materials)
     {
-        // bind appropriate textures
-        unsigned int diffuseNr  = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr   = 1;
-        unsigned int heightNr   = 1;
-        for(unsigned int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
-            string number;
-            string name = textures[i].type;
-            if(name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if(name == "texture_specular")
-                number = std::to_string(specularNr++); // transfer unsigned int to string
-            else if(name == "texture_normal")
-                number = std::to_string(normalNr++); // transfer unsigned int to string
-            else if(name == "texture_height")
-                number = std::to_string(heightNr++); // transfer unsigned int to string
+        //// bind appropriate textures
+        //unsigned int diffuseNr  = 1;
+        //unsigned int specularNr = 1;
+        //unsigned int normalNr   = 1;
+        //unsigned int heightNr   = 1;
+        //for(unsigned int i = 0; i < textures.size(); i++)
+        //{
+        //    glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+        //    // retrieve texture number (the N in diffuse_textureN)
+        //    string number;
+        //    string name = textures[i].type;
+        //    if(name == "texture_diffuse")
+        //        number = std::to_string(diffuseNr++);
+        //    else if(name == "texture_specular")
+        //        number = std::to_string(specularNr++); // transfer unsigned int to string
+        //    else if(name == "texture_normal")
+        //        number = std::to_string(normalNr++); // transfer unsigned int to string
+        //    else if(name == "texture_height")
+        //        number = std::to_string(heightNr++); // transfer unsigned int to string
 
-            // now set the sampler to the correct texture unit
-            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-            // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, textures[i].id);
-        }
+        //    // now set the sampler to the correct texture unit
+        //    glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+        //    // and finally bind the texture
+        //    glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        //}
+
+        glActiveTexture(GL_TEXTURE0);
+        // now set the sampler to the correct texture unit
+        glUniform1i(glGetUniformLocation(shader.ID, "texture_diffuse0"), 0);
+        // and finally bind the texture
+        glBindTexture(GL_TEXTURE_2D, images[textures[materials[materialIndex].baseColorTextureIndex].imageIndex]);
         
         // draw mesh
         glBindVertexArray(VAO);
