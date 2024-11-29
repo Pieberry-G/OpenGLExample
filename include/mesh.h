@@ -45,6 +45,9 @@ public:
     vector<Texture>      textures;
     unsigned int VAO;
 
+    glm::vec3 _minimumBounds;
+    glm::vec3 _maximumBounds;
+
     // constructor
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
     {
@@ -52,8 +55,25 @@ public:
         this->indices = indices;
         this->textures = textures;
 
+        computeBounds();
+
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
+    }
+
+    void computeBounds()
+    {
+        constexpr float MAX_FLOAT = std::numeric_limits<float>::max();
+        _minimumBounds = { MAX_FLOAT, MAX_FLOAT, MAX_FLOAT };
+        _maximumBounds = { -MAX_FLOAT, -MAX_FLOAT, -MAX_FLOAT };
+        for (auto& vertice : vertices)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                _minimumBounds[i] = std::min(vertice.Position[i], _minimumBounds[i]);
+                _maximumBounds[i] = std::max(vertice.Position[i], _maximumBounds[i]);
+            }
+        }
     }
 
     // render the mesh

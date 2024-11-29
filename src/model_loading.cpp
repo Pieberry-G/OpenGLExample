@@ -1,4 +1,3 @@
-//#if 0
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -17,11 +16,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 30.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -45,7 +44,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Render Demo", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -81,9 +80,9 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("../resources/objects/backpack/backpack.obj");
+    Model ourModel("../assets/meshes/demo0/demo0.gltf");
+    //Model ourModel("../assets/meshes/demo2/demo2.gltf");
     //Model ourModel("../assets/meshes/FlightHelmet/glTF/FlightHelmet.gltf");
-
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -118,8 +117,11 @@ int main()
 
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1, 0, 0));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+
+        glm::vec3 sphereCenter = (ourModel._maximumBounds + ourModel._minimumBounds) / 2.0f;
+        model = glm::translate(model, -sphereCenter); // translate it down so it's at the center of the scene
         ourShader.setMat4("model", model);
         ourModel.Draw(ourShader);
 
@@ -191,4 +193,3 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
-//#endif
